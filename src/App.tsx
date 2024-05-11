@@ -1,13 +1,37 @@
-import logo from './assets/logo.svg';
-import trash from './assets/trash.svg';
-import todo from './assets/todo.svg';
-import done from './assets/done.svg';
+import { nanoid } from "nanoid";
+import logo from "./assets/logo.svg";
+import { useState } from "react";
+import Item from "./components/Item";
+
+export type Item = {
+  id: string;
+  name: string;
+  quantity: string;
+  completed: boolean;
+};
 
 function App() {
+  const [items, setItems] = useState<Item[]>([
+    {
+      id: nanoid(),
+      name: "Leite em Pó",
+      quantity: "3 Caixas",
+      completed: false,
+    },
+    { id: nanoid(), name: "Banana", quantity: "1 dúzia", completed: true },
+  ]);
+
+  const completedItems = items.filter((item) => item.completed);
+  const notCompletedItems = items.filter((item) => !item.completed);
+
   return (
     <main className="max-w-2xl px-6 py-12 pb-20 mx-auto my-10 bg-white md:my-20 md:px-32 md:rounded-3xl">
       <header className="text-center">
-        <img src={logo} alt="logotipo" className="mx-auto" />
+        <img
+          src={logo}
+          alt="logotipo"
+          className="mx-auto"
+        />
         <h1 className="mt-4 text-3xl font-medium font-display">
           Lista de Compras
         </h1>
@@ -18,7 +42,10 @@ function App() {
       </header>
       <form className="flex gap-2">
         <div className="flex-shrink">
-          <label htmlFor="name" className="block text-xs text-slate-400">
+          <label
+            htmlFor="name"
+            className="block text-xs text-slate-400"
+          >
             Item
           </label>
           <input
@@ -28,7 +55,10 @@ function App() {
           />
         </div>
         <div className="flex-shrink">
-          <label htmlFor="quantity" className="block text-xs text-slate-400">
+          <label
+            htmlFor="quantity"
+            className="block text-xs text-slate-400"
+          >
             Quantidade
           </label>
           <input
@@ -42,63 +72,18 @@ function App() {
         </button>
       </form>
       <section className="mt-10 space-y-3 ">
-        <article className="flex w-full gap-4">
-          <img src={todo} alt="#" />
-          <div className="flex-1">
-            <p>Leite</p>
-            <p className="text-sm text-slate-400">3 Caixas</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
-        <article className="flex w-full gap-4">
-          <img src={todo} alt="#" />
-          <div className="flex-1">
-            <p>Maçã</p>
-            <p className="text-sm text-slate-400">500g</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
+        {notCompletedItems.map((item) => (
+          <Item item={item} />
+        ))}
       </section>
       <section className="mt-16 space-y-3">
         <h2 className="mb-10 text-3xl text-center font-display">
           Itens já comprados
         </h2>
-        <article className="flex w-full gap-4">
-          <img src={done} alt="#" />
-          <div className="flex-1">
-            <p className="line-through text-slate-400">Leite</p>
-            <p className="text-sm line-through text-slate-400">3 Caixas</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
-        <article className="flex w-full gap-4">
-          <img src={done} alt="#" />
-          <div className="flex-1">
-            <p className="line-through text-slate-400">Maçã</p>
-            <p className="text-sm line-through text-slate-400">500g</p>
-          </div>
-          <img
-            src={trash}
-            alt="ícone de lixeira"
-            className="justify-self-end"
-          />
-        </article>
-        <hr />
+
+        {completedItems.map((item) => (
+          <Item item={item} />
+        ))}
       </section>
     </main>
   );
