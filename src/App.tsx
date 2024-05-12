@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import logo from "./assets/logo.svg";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Item from "./components/Item";
 
 export type Item = {
@@ -21,8 +21,51 @@ function App() {
     { id: nanoid(), name: "Banana", quantity: "1 dúzia", completed: true },
   ]);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const completedItems = items.filter((item) => item.completed);
   const notCompletedItems = items.filter((item) => !item.completed);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formEl = event.currentTarget;
+    const formData = new FormData(formEl);
+
+    const name = formData.get("name") as string;
+    const quantity = formData.get("quantity") as string;
+
+    const item: Item = {
+      id: nanoid(),
+      name,
+      quantity,
+      completed: false,
+    };
+
+    const newItems = [item, ...items];
+    setItems(newItems);
+
+    formEl.reset();
+
+    inputRef.current && inputRef.current.focus();
+  }
+
+  function handleClickComplete(id: string) {
+    const newItems = items.map((item) => {
+      if (item.id === id) {
+        item.completed = !item.completed;
+      }
+
+      return item;
+    });
+
+    setItems(newItems);
+  }
+
+  function handleClickDelete(id: string) {
+    const newItems = items.filter((item) => item.id !== id);
+    setItems(newItems);
+  }
 
   return (
     <main className="max-w-2xl px-6 py-12 pb-20 mx-auto my-10 bg-white md:my-20 md:px-32 md:rounded-3xl">
@@ -40,7 +83,10 @@ function App() {
         </p>
         <hr className="w-1/3 mx-auto mt-6 mb-8" />
       </header>
-      <form className="flex gap-2">
+      <form
+        className="flex gap-2"
+        onSubmit={handleSubmit}
+      >
         <div className="flex-shrink">
           <label
             htmlFor="name"
@@ -49,8 +95,10 @@ function App() {
             Item
           </label>
           <input
+            ref={inputRef}
             type="text"
             id="name"
+            name="name"
             className="block w-full px-3 py-2 border rounded-lg border-slate-300 text-slate-700"
           />
         </div>
@@ -64,6 +112,7 @@ function App() {
           <input
             type="text"
             id="quantity"
+            name="quantity"
             className="block w-full px-3 py-2 border rounded-lg border-slate-300 text-slate-700"
           />
         </div>
@@ -73,7 +122,12 @@ function App() {
       </form>
       <section className="mt-10 space-y-3 ">
         {notCompletedItems.map((item) => (
-          <Item item={item} />
+          <Item
+            handleClickDelete={handleClickDelete}
+            handleClickComplete={handleClickComplete}
+            key={item.id}
+            item={item}
+          />
         ))}
       </section>
       <section className="mt-16 space-y-3">
@@ -82,7 +136,12 @@ function App() {
         </h2>
 
         {completedItems.map((item) => (
-          <Item item={item} />
+          <Item
+            handleClickDelete={handleClickDelete}
+            handleClickComplete={handleClickComplete}
+            key={item.id}
+            item={item}
+          />
         ))}
       </section>
     </main>
